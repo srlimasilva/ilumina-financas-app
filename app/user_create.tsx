@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react'
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
-import { auth, db } from '../scripts/firebase-config.js';
+import { auth, db } from '../scripts/firebase-config';
 import {createUserWithEmailAndPassword} from 'firebase/auth'
 import {ref,set} from 'firebase/database';
  
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         marginBottom: 50
     },
     container: {
-        backgroundColor: "#F60",
+        backgroundColor: "grey",
         padding: 30,
         flex: 1,
         width: '100%',
