@@ -46,7 +46,7 @@ export default function Index() {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: "#F60",
+        backgroundColor: "grey",
         padding: 30,
         flex: 1,
         alignItems: 'center',
@@ -54,7 +54,10 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     logo: {
+        width: 150,
+        height: 150,
         marginBottom: 50,
+        resizeMode: 'contain',
     },
     alert: {
         fontSize: 18,
