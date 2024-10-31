@@ -50,15 +50,6 @@ export default function AddExpenseScreen() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => {router.push('/internas/transactions');}}>
-                    <Icon name="arrow-back" size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Novo lançamento</Text>
-            </View>
-
-            
-
             <TextInput
                 style={styles.input}
                 placeholder="R$ 0,00"
@@ -118,32 +109,18 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1E1E1E',
-        paddingHorizontal: 15,
+        paddingHorizontal: 10,
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 15,
-        backgroundColor: '#333',
-    },
-    headerTitle: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginLeft: 190,
-        
 
-
-    },
     tabContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginVertical: 10,
+        marginVertical: 150,
     },
     tab: {
         color: '#B0B0B0',
         fontSize: 16,
-        marginHorizontal: 20,
+        marginHorizontal: 30,
         paddingBottom: 5,
     },
     input: {

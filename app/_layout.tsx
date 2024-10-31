@@ -22,6 +22,10 @@ export default function RootLayout() {
                 headerShown: false,
                 headerTitle: ''
             }} />
+            <Stack.Screen name="adcDespesas" options={{
+                headerShown: true,
+                headerTitle: 'Nova despesa'
+            }} />
         </Stack>
     );
 }
