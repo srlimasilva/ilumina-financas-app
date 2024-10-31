@@ -1,10 +1,9 @@
-import { useRouter } from 'expo-router';
 import React, { useState } from 'react'
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
-import { auth, db } from '../scripts/firebase-config';
-import {createUserWithEmailAndPassword} from 'firebase/auth'
-import {ref,set} from 'firebase/database';
- 
+import { auth, db } from "../scripts/firebase-config";
+import { useRouter } from 'expo-router';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { ref, set } from 'firebase/database';
 
 
 export default function CreateUser() {
@@ -19,7 +18,7 @@ export default function CreateUser() {
             setErrorCreateUser("Informe um nome");
         } else if (email == "") {
             setErrorCreateUser("Informe um email");
-        } else if (password = "") {
+        } else if (password == "") {
             setErrorCreateUser("Informe uma senha")
         } else {
             setErrorCreateUser(null)
