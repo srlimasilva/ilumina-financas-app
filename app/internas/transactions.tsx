@@ -9,20 +9,8 @@ export default function Transactions() {
     const router = useRouter();
     const [transactions, setTransactions] = useState([]);
 
-    useEffect(() => {
-        const transactionsRef = ref(db, 'transactions');
 
-        const unsubscribe = onValue(transactionsRef, (snapshot) => {
-            const transactionsData = snapshot.val() || {};
-            const transactionList = Object.keys(transactionsData).map(key => ({
-                id: key,
-                ...transactionsData[key]
-            }));
-            setTransactions(transactionList);
-        });
-
-        return () => off(transactionsRef);
-    }, []);
+       
 
     return (
         <View style={styles.container}>
@@ -31,13 +19,10 @@ export default function Transactions() {
                 data={transactions}
                 renderItem={({ item }) => (
                     <View style={styles.transactionItem}>
-                        <Text>{item.date}</Text>
-                        <Text>{item.description}</Text>
-                        <Text>{item.amount}</Text>
-                        <Text>{item.category}</Text>
+                        
                     </View>
                 )}
-                keyExtractor={(item) => item.id}
+               
             />
 
             {/* Botão para redirecionar para a tela de adicionar despesas */}

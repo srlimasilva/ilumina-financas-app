@@ -20,17 +20,6 @@ export default function Layout() {
                 tabBarInactiveTintColor: "#FFF"
             }}
         >
-            
-    
-            <Tabs.Screen name="Transações" options={{
-                headerTitle: "Transações",
-                tabBarIcon: ({ color }) => (
-                    <MaterialCommunityIcons
-                        name="account"
-                        color={color}
-                        size={32}
-                    />)
-            }} />
 
             <Tabs.Screen name="user" options={{
                 headerTitle: "Dados do Usuário",
@@ -41,7 +30,17 @@ export default function Layout() {
                         size={32}
                     />)
             }} />
-            
+
+            <Tabs.Screen name="transactions" options={{
+                headerTitle: "Transações",
+                tabBarIcon: ({ color }) => (
+                    <MaterialCommunityIcons
+                        name="bank-transfer"
+                        color={color}
+                        size={32}
+                    />)
+            }} />
+
         </Tabs>
     );
 }
