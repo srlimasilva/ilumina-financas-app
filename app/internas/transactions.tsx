@@ -1,116 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
-import   
- { ref, onValue, off } from "firebase/database";
-import { auth, db } from '@/scripts/firebase-config';
-import { Link, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, FlatList, Alert } from 'react-native';
+import { ref, onValue } from 'firebase/database';
+import { db } from '@/scripts/firebase-config';
+import { getAuth } from 'firebase/auth';
+import { Link } from 'expo-router';
 
-export default function Transactions() {
-  const router = useRouter();
-  const [transactions, setTransactions] = useState([]);
-  const userId = auth.currentUser ? auth.currentUser.uid : null; // Replace with actual user ID
+export default function ExpensesScreen() {
+    const [expenses, setExpenses] = useState([]);
+    const auth = getAuth();
+    const userId = auth.currentUser ? auth.currentUser.uid : null;
 
-  useEffect(() => {
-    const unsubscribe = onValue(ref(db, `users/${userId}/expenses`), (snapshot) => {
-      const data = snapshot.val();
-      if (data) { // Verifica se há dados antes de iterar
-        const transactionsArray = Object.entries(data).map(([key, value]) => ({
-          id: key,
-          ...value
-        }));
-        setTransactions(transactionsArray);
-      } else {
-        setTransactions([]); // Limpa o array de transações se não houver dados
-      }
-    });
-  
-    return () => unsubscribe();
-  }, [userId]);
+    useEffect(() => {
+        if (!userId) {
+            Alert.alert("Erro", "Usuário não autenticado.");
+            return;
+        }
 
-  
-  const handleDeleteTransaction = () => {
-    // Delete transaction from Firebase
-    ref(db, `users/${userId}/expenses/${transactionId}`).remove()
-      .then(() => {
-        // Update the transactions state
-        setTransactions(transactions.filter(transaction => transaction.id !== transactionId));
-      })
-      .catch(error => {
-        console.error('Error deleting transaction:', error);   
+        const expensesRef = ref(db, `users/${userId}/expenses`);
+        const unsubscribe = onValue(expensesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const loadedExpenses = Object.keys(data).map((key) => ({
+                    id: key,
+                    ...data[key]
+                }));
+                setExpenses(loadedExpenses);
+            } else {
+                setExpenses([]);
+            }
+        });
 
-      });
-  };
+        return () => unsubscribe();
+    }, [userId]);
 
-  const handleMarkAsPaid = (expenseData) => {
-    // Update the transaction's "paid" status in Firebase
-    ref(db, `users/${userId}/expenses/${transactionId}`).update({
-      paid: true
-    })
-      .then(() => {
-        // Update the transactions state
-        setTransactions(transactions.map(transaction => {
-          if (transaction.id === transactionId) {
-            return { ...transaction, paid: true };
-          }
-          return transaction;
-        }));
-      })
-      .catch(error => {
-        console.error('Error marking transaction as paid:', error);
-      });
-  };
+    const renderExpenseItem = ({ item }) => (
+        <View style={styles.expenseItem}>
+            <Text style={styles.expenseAmount}>R$ {item.amount.toFixed(2)}</Text>
+            <Text style={styles.expenseDescription}>{item.description}</Text>
+            <Text style={styles.expenseDate}>Vencimento: {item.dueDate}</Text>
+        </View>
+    );
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Transações</Text>
-      <FlatList
-        data={transactions}
-        renderItem={({ item }) => (
-          <View style={styles.transactionItem}>
-            <Text>{item.description}</Text>
-            <Text>R$ {item.amount}</Text>
-            <Text>Vencimento: {item.dueDate}</Text>
-            <Text>Repetição: {item.repeatOption}</Text>
-            <Text>Pago: {item.paid ? 'Sim' : 'Não'}</Text>
-            <TouchableOpacity onPress={() => handleEditTransaction(item.id)}>
-              <Text style={styles.actionButton}>Editar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDeleteTransaction(item.id)}>
-              <Text style={styles.actionButton}>Excluir</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleMarkAsPaid(item.id)}>
-              <Text style={styles.actionButton}>{item.paid ? 'Desmarcar como Pago' : 'Marcar como Pago'}</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        keyExtractor={item => item.id}
-      />
-
-      {/* Botão para redirecionar para a tela de adicionar despesas */}
-      <Link href="/adcDespesas" style={styles.addButton}>
-        <Text style={styles.addButtonText}>+ Adicionar Despesa</Text>
-      </Link>
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <Text style={styles.header}>Minhas Despesas</Text>
+            <FlatList
+                data={expenses}
+                keyExtractor={(item) => item.id}
+                renderItem={renderExpenseItem}
+                ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma despesa encontrada.</Text>}
+            />
+            <Link href="/adcDespesas" style={styles.addButton}>
+                <Text style={styles.addButtonText}>+ Adicionar Despesa</Text>
+            </Link>
+        </View>
+    );
 }
-
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#1E1E1E',
         padding: 20,
-        backgroundColor: '#fff',
     },
-    title: {
+    header: {
+        color: '#FFF',
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+        textAlign: 'center',
     },
-    transactionItem: {
+    expenseItem: {
+        backgroundColor: '#333',
         padding: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        flexDirection: 'column',
+        borderRadius: 8,
+        marginBottom: 10,
+    },
+    expenseAmount: {
+        color: '#00BFFF',
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    expenseDescription: {
+        color: '#FFF',
+        fontSize: 16,
+        marginTop: 5,
+    },
+    expenseDate: {
+        color: '#B0B0B0',
+        fontSize: 14,
+        marginTop: 5,
+    },
+    emptyText: {
+        color: '#FFF',
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: 50,
     },
     addButton: {
         backgroundColor: '#00BFFF',

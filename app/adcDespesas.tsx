@@ -4,10 +4,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ref, push } from 'firebase/database';
 import { db } from '@/scripts/firebase-config';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
-import Transactions from './Transações';
-import User from './user';
 
 export default function AddExpenseScreen() {
     const [amount, setAmount] = useState('');
@@ -16,15 +14,15 @@ export default function AddExpenseScreen() {
     const [repeatOption, setRepeatOption] = useState('Não repetir');
     const [showDatePicker, setShowDatePicker] = useState(false);
 
-    // Obtendo o ID do usuário autenticado
     const auth = getAuth();
-    const userId = auth.currentUser ? auth.currentUser.uid : null; // ID do usuário
+    const userId = auth.currentUser ? auth.currentUser.uid : null;
+    const router = useRouter();
 
     const handleSave = async () => {
         if (amount && description) {
             if (!userId) {
                 Alert.alert('Erro', 'Usuário não autenticado.');
-                return; // Para a execução se o userId não estiver definido
+                return;
             }
 
             const expenseData = {
@@ -35,10 +33,9 @@ export default function AddExpenseScreen() {
             };
 
             try {
-                // Salvar a despesa sob o ID do usuário
-                await push(ref(db, `user/${userId}/expenses`), expenseData);
+                await push(ref(db, `users/${userId}/expenses`), expenseData);
                 Alert.alert('Sucesso', 'Despesa adicionada com sucesso!');
-                router.push('/internas/transactions'); // Redireciona após salvar
+                router.push('/internas/transactions'); // Redireciona para a tela de despesas
             } catch (error) {
                 Alert.alert('Erro', 'Ocorreu um erro ao salvar a despesa.');
                 console.error(error);
@@ -110,18 +107,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#1E1E1E',
         paddingHorizontal: 10,
-    },
-
-    tabContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginVertical: 150,
-    },
-    tab: {
-        color: '#B0B0B0',
-        fontSize: 16,
-        marginHorizontal: 30,
-        paddingBottom: 5,
     },
     input: {
         backgroundColor: '#333',
