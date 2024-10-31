@@ -6,6 +6,8 @@ import { db } from '@/scripts/firebase-config';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { getAuth } from 'firebase/auth';
+import Transactions from './Transações';
+import User from './user';
 
 export default function AddExpenseScreen() {
     const [amount, setAmount] = useState('');
@@ -49,16 +51,13 @@ export default function AddExpenseScreen() {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => {/* função para voltar */}}>
+                <TouchableOpacity onPress={() => {router.push('/internas/transactions');}}>
                     <Icon name="arrow-back" size={24} color="#fff" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Novo lançamento</Text>
             </View>
 
-            <View style={styles.tabContainer}>
-                <Text style={[styles.tab, { borderBottomColor: 'red' }]}>Despesa</Text>
-                <Text style={styles.tab}>Receita</Text>
-            </View>
+            
 
             <TextInput
                 style={styles.input}
@@ -131,7 +130,10 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
-        marginLeft: 10,
+        marginLeft: 190,
+        
+
+
     },
     tabContainer: {
         flexDirection: 'row',

@@ -41,7 +41,7 @@ export default function Transactions() {
             />
 
             {/* Botão para redirecionar para a tela de adicionar despesas */}
-            <Link href= '/internas/adcDespesas' style={styles.addButton}>
+            <Link href= '../adcDespesas' style={styles.addButton}>
                 <Text style={styles.addButtonText}>+ Adicionar Despesa</Text>
             </Link>
         </View>

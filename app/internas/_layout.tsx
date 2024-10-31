@@ -23,7 +23,7 @@ export default function Layout() {
             
     
             <Tabs.Screen name="Transações" options={{
-                headerTitle: "Dados do Usuário",
+                headerTitle: "Transações",
                 tabBarIcon: ({ color }) => (
                     <MaterialCommunityIcons
                         name="account"
