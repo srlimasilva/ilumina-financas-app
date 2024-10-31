@@ -1,35 +1,76 @@
+import { auth } from '@/scripts/firebase-config';
 import { useRouter } from 'expo-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 
 export default function Index() {
     const router = useRouter();
+    const [email,setEmail] = useState("");
+    const [password,setPassword] = useState("");
+    const [errorLogin,setErrorLogin] = useState("");
+
+    const validarCampos = () => {
+        if (email == "") {
+            setErrorLogin("Informe seu e-mail.");
+        } else if (password == "") {
+            setErrorLogin("Informe sua senha");
+        } else {
+            setErrorLogin("");
+            login();
+        }
+    }
+
+    const login = () => {
+
+        signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          setEmail("");
+          setPassword("");
+          setErrorLogin("");
+          router.push("/internas/tasks");
+            
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorLogin (errorMessage)
+        });
+
+
+    }
+
+
+
+
     return (
         <View style={styles.container}>
             <Image style={styles.logo} source={require('../assets/images/teste1.png')} />
 
-            {/* {errorLogin != null && (
+            {errorLogin != null && (
                 <Text style={styles.alert}>{errorLogin}</Text>
-            )} */}
+            )}
 
             <TextInput
                 style={styles.input}
                 placeholder='E-mail'
-                // value={email}
-                // onChangeText={setEmail}
+                value={email}
+                onChangeText={setEmail}
             />
 
             <TextInput
                 style={styles.input}
                 placeholder='Senha'
                 secureTextEntry={true}
-                // value={password}
-                // onChangeText={setPassword}
+                value={password}
+                onChangeText={setPassword}
             />
 
             <TouchableOpacity style={styles.button}
-                // onPress={validate}
-                onPress={() => router.push('/internas/tasks')}
+                onPress={validarCampos}
+                
             >
                 <Text style={styles.textButton}>Entrar</Text>
             </TouchableOpacity>
