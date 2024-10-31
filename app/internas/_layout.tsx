@@ -7,9 +7,9 @@ export default function Layout() {
         <Tabs
             screenOptions={{
                 //Cor do cabeçalho
-                headerStyle: { backgroundColor: "grey"},
+                headerStyle: { backgroundColor: "grey" },
                 //Cor da tab bar
-                tabBarStyle: {backgroundColor: "#070A52"},
+                tabBarStyle: { backgroundColor: "#070A52" },
                 //Centraliza o título no cabeçalho
                 headerTitleAlign: 'center',
                 //Cor do texto cabeçalho
@@ -20,35 +20,28 @@ export default function Layout() {
                 tabBarInactiveTintColor: "#FFF"
             }}
         >
-            <Tabs.Screen name="tasks" options={{
-            headerTitle: "Tarefas", 
-            tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-            name="check-circle-outline"
-            color={color}
-            size={32}
-      />
-    )
-  }}
-/>
+            
+    
+            <Tabs.Screen name="Transações" options={{
+                headerTitle: "Dados do Usuário",
+                tabBarIcon: ({ color }) => (
+                    <MaterialCommunityIcons
+                        name="account"
+                        color={color}
+                        size={32}
+                    />)
+            }} />
+
             <Tabs.Screen name="user" options={{
                 headerTitle: "Dados do Usuário",
                 tabBarIcon: ({ color }) => (
                     <MaterialCommunityIcons
-                    name="account"
-                    color={color}
-                    size={32}
+                        name="account"
+                        color={color}
+                        size={32}
                     />)
             }} />
-            <Tabs.Screen name="about" options={{
-                headerTitle: "Sobre o aplicativo",
-                tabBarIcon: ({ color }) => (
-                    <MaterialCommunityIcons
-                    name="information-outline"
-                    color={color}
-                    size={32}
-                    />)
-            }} />
+            
         </Tabs>
     );
 }

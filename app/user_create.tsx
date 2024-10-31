@@ -1,48 +1,51 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react'
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
-import { auth, db } from "../scripts/firebase-config";
-import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { ref, set } from 'firebase/database';
+import { auth, db } from '../scripts/firebase-config';
+import {createUserWithEmailAndPassword} from 'firebase/auth'
+import {ref,set} from 'firebase/database';
+ 
+
 
 export default function CreateUser() {
     const router = useRouter();
-    const [nome, setNome] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [errorCreateUser, setErrorCreateUser] = useState("");
+    const [nome, setNome] = useState(null)
+    const [email, setEmail] = useState(null)
+    const [password, setPassword] = useState(null)
+    const [errorCreateUser, setErrorCreateUser] = useState(null)
 
     const validarCampos = () => {
         if (nome == "") {
-            setErrorCreateUser("Informe um Nome.");
+            setErrorCreateUser("Informe um nome");
         } else if (email == "") {
-            setErrorCreateUser("Informe um E-Mail");
-        } else if (password == "") {
-            setErrorCreateUser("Informe uma Senha");
-
+            setErrorCreateUser("Informe um email");
+        } else if (password = "") {
+            setErrorCreateUser("Informe uma senha")
         } else {
-            setErrorCreateUser("");
+            setErrorCreateUser(null)
+            
         }
+
     }
 
+    // Função que cria o usuário no Firebase
     const createUser = () => {
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                // Signed up 
-                const user = userCredential.user;
-                set(ref(db, 'user/' + user.uid), {
-                    nome: nome,
-                    email: email
-                })
-                router.push('/');
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                setErrorCreateUser(errorMessage);
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Signed up 
+            const user = userCredential.user;
+            set(ref(db, 'user/'+ user.uid), {
+                nome: nome,
+                email: email
             });
-    }
-
+            router.push('/')
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            setErrorCreateUser(errorMessage);
+        });
+}
 
     return (
         <View style={styles.container}>
@@ -50,12 +53,12 @@ export default function CreateUser() {
                 <Text style={styles.alert}>{errorCreateUser}</Text>
             )}
 
+
             <Text style={styles.titulo}>Cadastrar Usuário</Text>
 
             <TextInput
                 style={styles.input}
                 placeholder='Nome'
-                placeholderTextColor={"#7D7D7D"}
                 value={nome}
                 onChangeText={setNome}
             />
@@ -63,7 +66,6 @@ export default function CreateUser() {
             <TextInput
                 style={styles.input}
                 placeholder='E-mail'
-                placeholderTextColor={"#7D7D7D"}
                 value={email}
                 onChangeText={setEmail}
             />
@@ -72,15 +74,13 @@ export default function CreateUser() {
                 style={styles.input}
                 secureTextEntry={true}
                 placeholder='Senha'
-                placeholderTextColor={"#7D7D7D"}
                 value={password}
                 onChangeText={setPassword}
             />
 
             <TouchableOpacity
                 style={styles.button}
-                onPress={validarCampos}
-                onPressIn={createUser}
+                onPress={createUser}
             >
                 <Text style={styles.textButton}>Criar usuário</Text>
             </TouchableOpacity>

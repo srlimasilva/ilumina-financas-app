@@ -4,6 +4,7 @@ import {auth} from "@/scripts/firebase-config";
 import { signOut } from "firebase/auth";
 import React, { useState } from 'react'
 
+
 export default function User() {
     
     const router = useRouter();

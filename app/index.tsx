@@ -1,77 +1,59 @@
 import { auth } from '@/scripts/firebase-config';
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 
-export default function Index() {
+export default function LoginScreen() {
     const router = useRouter();
-    const [email,setEmail] = useState("");
-    const [password,setPassword] = useState("");
-    const [errorLogin,setErrorLogin] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [errorLogin, setErrorLogin] = useState("");
 
     const validarCampos = () => {
-        if (email == "") {
+        if (email === "") {
             setErrorLogin("Informe seu e-mail.");
-        } else if (password == "") {
+        } else if (password === "") {
             setErrorLogin("Informe sua senha");
         } else {
             setErrorLogin("");
             login();
         }
-    }
+    };
 
     const login = () => {
-
         signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed in 
-          const user = userCredential.user;
-          setEmail("");
-          setPassword("");
-          setErrorLogin("");
-          router.push("/internas/tasks");
-            
+            setEmail("");
+            setPassword("");
+            setErrorLogin("");
+            router.push("/internas/user");
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorLogin (errorMessage)
+            setErrorLogin(error.message);
         });
-
-
-    }
-
-
-
+    };
 
     return (
         <View style={styles.container}>
             <Image style={styles.logo} source={require('../assets/images/teste1.png')} />
-
-            {errorLogin != null && (
-                <Text style={styles.alert}>{errorLogin}</Text>
-            )}
+            {errorLogin && <Text style={styles.alert}>{errorLogin}</Text>}
 
             <TextInput
                 style={styles.input}
-                placeholder='E-mail'
+                placeholder="E-mail"
                 value={email}
                 onChangeText={setEmail}
             />
-
             <TextInput
                 style={styles.input}
-                placeholder='Senha'
-                secureTextEntry={true}
+                placeholder="Senha"
+                secureTextEntry
                 value={password}
                 onChangeText={setPassword}
             />
 
-            <TouchableOpacity style={styles.button}
-                onPress={validarCampos}
-                
-            >
+            <TouchableOpacity style={styles.button} onPress={validarCampos}>
                 <Text style={styles.textButton}>Entrar</Text>
             </TouchableOpacity>
 
@@ -139,4 +121,4 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#fff'
     }
-})
+});
