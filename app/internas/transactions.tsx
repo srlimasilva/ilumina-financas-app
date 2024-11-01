@@ -96,6 +96,19 @@ export default function ExpensesScreen() {
         });
     };
 
+    const handleMarkAsPending = () => {
+        const expenseRef = ref(db, `users/${userId}/expenses/${selectedExpense.id}`);
+        update(expenseRef, { status: "pendente" })
+        .then(() => {
+            Alert.alert("Sucesso", "Despesa marcada como pendente.");
+            closeModal();
+        })
+        .catch((error) => {
+            Alert.alert("Erro", "Ocorreu um erro ao marcar a despesa como pendente.");
+            console.error(error);
+        });
+    };
+
     const renderExpenseItem = ({ item }) => (
         <TouchableOpacity onPress={() => openModal(item)} style={styles.expenseItem}>
             <Text style={styles.expenseAmount}>R$ {item.amount.toFixed(2)}</Text>
@@ -141,6 +154,7 @@ export default function ExpensesScreen() {
                             <Button title="Atualizar" onPress={handleUpdateExpense} />
                             <Button title="Excluir" onPress={handleDeleteExpense} color="red" />
                             <Button title="Marcar como Paga" onPress={handleMarkAsPaid} color="green" />
+                            <Button title="Marcar como Pendente" onPress={handleMarkAsPending} color="orange" />
                             <Button title="Cancelar" onPress={closeModal} color="gray" />
                         </View>
                     </View>
