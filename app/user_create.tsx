@@ -1,57 +1,55 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
 import { auth, db } from "../scripts/firebase-config";
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { ref, set } from 'firebase/database';
 
-
 export default function CreateUser() {
     const router = useRouter();
-    const [nome, setNome] = useState(null)
-    const [email, setEmail] = useState(null)
-    const [password, setPassword] = useState(null)
-    const [errorCreateUser, setErrorCreateUser] = useState(null)
+    const [nome, setNome] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [errorCreateUser, setErrorCreateUser] = useState(null);
 
     const validarCampos = () => {
-        if (nome == "") {
+        if (nome === "") {
             setErrorCreateUser("Informe um nome");
-        } else if (email == "") {
+            return false;
+        } else if (email === "") {
             setErrorCreateUser("Informe um email");
-        } else if (password == "") {
-            setErrorCreateUser("Informe uma senha")
-        } else {
-            setErrorCreateUser(null)
-            
+            return false;
+        } else if (password === "") {
+            setErrorCreateUser("Informe uma senha");
+            return false;
         }
+        setErrorCreateUser(null);
+        return true;
+    };
 
-    }
-
-    // Função que cria o usuário no Firebase
     const createUser = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // Signed up 
-            const user = userCredential.user;
-            set(ref(db, 'user/'+ user.uid), {
-                nome: nome,
-                email: email
+        if (!validarCampos()) return;
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                set(ref(db, 'users/' + user.uid), {
+                    nome: nome,
+                    email: email
+                });
+                router.push('/');
+            })
+            .catch((error) => {
+                const errorMessage = error.message;
+                setErrorCreateUser(errorMessage);
             });
-            router.push('/')
-        })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            setErrorCreateUser(errorMessage);
-        });
-}
+    };
 
     return (
         <View style={styles.container}>
-            {errorCreateUser != null && (
+            {errorCreateUser && (
                 <Text style={styles.alert}>{errorCreateUser}</Text>
             )}
-
 
             <Text style={styles.titulo}>Cadastrar Usuário</Text>
 
@@ -67,6 +65,7 @@ export default function CreateUser() {
                 placeholder='E-mail'
                 value={email}
                 onChangeText={setEmail}
+                keyboardType='email-address'
             />
 
             <TextInput

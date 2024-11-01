@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, Modal, TextInput, Button } from 'react-native';
-import { ref, onValue, remove, update } from 'firebase/database';
+import { ref, onValue, remove, update, push } from 'firebase/database';
 import { db } from '@/scripts/firebase-config';
 import { getAuth } from 'firebase/auth';
+import { Link } from 'expo-router';
 
 export default function ExpensesScreen() {
     const [expenses, setExpenses] = useState([]);
@@ -85,7 +86,7 @@ export default function ExpensesScreen() {
 
     const handleMarkAsPaid = () => {
         const expenseRef = ref(db, `users/${userId}/expenses/${selectedExpense.id}`);
-        update(expenseRef, { status: "pago" })
+        update(expenseRef, { status: "PAGO" })
         .then(() => {
             Alert.alert("Sucesso", "Despesa marcada como paga.");
             closeModal();
@@ -98,7 +99,7 @@ export default function ExpensesScreen() {
 
     const handleMarkAsPending = () => {
         const expenseRef = ref(db, `users/${userId}/expenses/${selectedExpense.id}`);
-        update(expenseRef, { status: "pendente" })
+        update(expenseRef, { status: "PENDENTE" })
         .then(() => {
             Alert.alert("Sucesso", "Despesa marcada como pendente.");
             closeModal();
@@ -110,11 +111,17 @@ export default function ExpensesScreen() {
     };
 
     const renderExpenseItem = ({ item }) => (
-        <TouchableOpacity onPress={() => openModal(item)} style={styles.expenseItem}>
+        <TouchableOpacity 
+            onPress={() => openModal(item)} 
+            style={[
+                styles.expenseItem, 
+                item.status === 'PAGO' ? styles.expenseStatusPaid : styles.expenseStatusPending
+            ]}
+        >
             <Text style={styles.expenseAmount}>R$ {item.amount.toFixed(2)}</Text>
             <Text style={styles.expenseDescription}>{item.description}</Text>
             <Text style={styles.expenseDate}>Vencimento: {item.dueDate}</Text>
-            <Text style={styles.expenseStatus}>Status: {item.status || "pendente"}</Text>
+            <Text style={styles.expenseStatus}>Status: {item.status || "PENDENTE"}</Text>
         </TouchableOpacity>
     );
 
@@ -160,6 +167,10 @@ export default function ExpensesScreen() {
                     </View>
                 </View>
             </Modal>
+
+            <Link href="/adcDespesas" style={styles.addButton} onPress={() => { setEditAmount(''); setEditDescription(''); }}>
+                <Text style={styles.addButtonText}>+ Adicionar Despesa</Text>
+            </Link>
         </View>
     );
 }
@@ -178,13 +189,18 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     expenseItem: {
-        backgroundColor: '#333',
         padding: 15,
         borderRadius: 8,
         marginBottom: 10,
     },
+    expenseStatusPaid: {
+        backgroundColor: '#32CD32', // Verde para "PAGO"
+    },
+    expenseStatusPending: {
+        backgroundColor: '#FF6347', // Vermelho para "PENDENTE"
+    },
     expenseAmount: {
-        color: '#00BFFF',
+        color: '#FFF',
         fontSize: 20,
         fontWeight: 'bold',
     },
@@ -194,7 +210,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     expenseDate: {
-        color: '#B0B0B0',
+        color: 'white',
         fontSize: 14,
         marginTop: 5,
     },
@@ -237,6 +253,18 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     modalButtons: {
+        marginTop: 20
+    },
+    addButton: {
+        backgroundColor: '#00BFFF',
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
         marginTop: 20,
     },
-});
+    addButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+})
