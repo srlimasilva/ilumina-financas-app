@@ -45,7 +45,6 @@ export default function User() {
             <Text style={styles.infoText}>Nome: {userName}</Text>
             <Text style={styles.infoText}>Email: {userEmail}</Text>
 
-            
         </View>
 
 
