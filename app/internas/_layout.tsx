@@ -31,15 +31,29 @@ export default function Layout() {
                     />)
             }} />
 
-            <Tabs.Screen name="transactions" options={{
-                headerTitle: "Transações",
+            <Tabs.Screen name="receitas" options={{
+                headerShown: false,
+                headerTitle: "",
                 tabBarIcon: ({ color }) => (
                     <MaterialCommunityIcons
-                        name="bank-transfer"
+                        name="bank-transfer-in"
                         color={color}
                         size={32}
                     />)
             }} />
+
+            <Tabs.Screen name="despesas" options={{
+                headerShown: false,
+                headerTitle: "",
+                tabBarIcon: ({ color }) => (
+                    <MaterialCommunityIcons
+                        name="bank-transfer-out"
+                        color={color}
+                        size={32}
+                    />)
+            }} />
+
+
 
         </Tabs>
     );
