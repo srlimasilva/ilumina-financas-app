@@ -10,7 +10,8 @@ import { getAuth } from 'firebase/auth';
 export default function AddIncomeScreen() {
     const [amount, setAmount] = useState('');
     const [description, setDescription] = useState('');
-    const [receivedDate, setReceivedDate] = useState(new Date());
+    const [dueDate, setDueDate] = useState(new Date());
+    const [repeatOption, setRepeatOption] = useState('Não repetir');
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     const auth = getAuth();
@@ -24,20 +25,17 @@ export default function AddIncomeScreen() {
                 return;
             }
 
-
             const incomeData = {
                 amount: parseFloat(amount),
                 description,
-                receivedDate: receivedDate.toISOString().split('T')[0],
+                dueDate: dueDate.toISOString().split('T')[0],
+                repeatOption,
             };
 
             try {
                 await push(ref(db, `users/${userId}/incomes`), incomeData);
                 Alert.alert('Sucesso', 'Receita adicionada com sucesso!');
-                setAmount('');
-                setDescription('');
-                setReceivedDate(new Date());
-                router.push('/internas/receitas'); // Redireciona para a tela de receitas/despesas
+                router.push('/internas/receitas'); // Redireciona para a tela de receitas
             } catch (error) {
                 Alert.alert('Erro', 'Ocorreu um erro ao salvar a receita.');
                 console.error(error);
@@ -67,17 +65,17 @@ export default function AddIncomeScreen() {
             />
 
             <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-                <Text style={{ color: '#fff' }}>{receivedDate.toLocaleDateString()}</Text>
+                <Text style={{ color: '#fff' }}>{dueDate.toLocaleDateString()}</Text>
                 <Icon name="calendar-today" size={24} color="#B0B0B0" style={styles.icon} />
             </TouchableOpacity>
             {showDatePicker && (
                 <DateTimePicker
-                    value={receivedDate}
+                    value={dueDate}
                     mode="date"
                     display="default"
                     onChange={(event, selectedDate) => {
                         setShowDatePicker(false);
-                        if (selectedDate) setReceivedDate(selectedDate);
+                        if (selectedDate) setDueDate(selectedDate);
                     }}
                 />
             )}
@@ -109,6 +107,25 @@ const styles = StyleSheet.create({
     icon: {
         position: 'absolute',
         right: 10,
+    },
+    repeatOptions: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginVertical: 15,
+    },
+    repeatButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 8,
+        borderColor: '#00BFFF',
+        borderWidth: 1,
+    },
+    selectedRepeatButton: {
+        backgroundColor: '#00BFFF',
+    },
+    repeatButtonText: {
+        color: '#fff',
+        fontSize: 14,
     },
     saveButton: {
         backgroundColor: '#00BFFF',

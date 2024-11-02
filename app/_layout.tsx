@@ -26,6 +26,10 @@ export default function RootLayout() {
                 headerShown: true,
                 headerTitle: 'Nova despesa'
             }} />
+            <Stack.Screen name="adcReceitas" options={{
+                headerShown: true,
+                headerTitle: 'Nova receita'
+            }} />
         </Stack>
     );
 }

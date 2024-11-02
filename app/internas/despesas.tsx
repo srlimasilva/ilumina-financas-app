@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, Modal, TextI
 import { ref, onValue, remove, update, push } from 'firebase/database';
 import { db } from '@/scripts/firebase-config';
 import { getAuth } from 'firebase/auth';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Link } from 'expo-router';
 
 export default function ExpensesScreen() {
@@ -11,6 +12,8 @@ export default function ExpensesScreen() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [editAmount, setEditAmount] = useState('');
     const [editDescription, setEditDescription] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState(new Date());
+    const [showMonthPicker, setShowMonthPicker] = useState(false);
 
     const auth = getAuth();
     const userId = auth.currentUser ? auth.currentUser.uid : null;
@@ -110,6 +113,33 @@ export default function ExpensesScreen() {
         });
     };
 
+    const filterExpensesByMonth = () => {
+        const selectedMonthNumber = selectedMonth.getMonth();
+        const selectedYear = selectedMonth.getFullYear();
+        return expenses.filter((expense) => {
+            const expenseDate = new Date(expense.dueDate);
+            return (
+                expenseDate.getMonth() === selectedMonthNumber &&
+                expenseDate.getFullYear() === selectedYear
+            );
+        });
+    };
+
+    const calculateTotalByType = (filteredExpenses) => {
+        let totalDespesas = 0;
+        let totalReceitas = 0;
+
+        filteredExpenses.forEach((expense) => {
+            if (expense.type === 'DESPESA') {
+                totalDespesas += expense.amount;
+            } else if (expense.type === 'RECEITA') {
+                totalReceitas += expense.amount;
+            }
+        });
+
+        return { totalDespesas, totalReceitas };
+    };
+
     const renderExpenseItem = ({ item }) => (
         <TouchableOpacity 
             onPress={() => openModal(item)} 
@@ -120,16 +150,37 @@ export default function ExpensesScreen() {
         >
             <Text style={styles.expenseAmount}>R$ {item.amount.toFixed(2)}</Text>
             <Text style={styles.expenseDescription}>{item.description}</Text>
-            <Text style={styles.expenseDate}>Vencimento: {item.dueDate}</Text>
+            <Text style={styles.expenseDate}>Vencimento: {new Date(item.dueDate).toLocaleDateString('pt-BR')}</Text>
             <Text style={styles.expenseStatus}>Status: {item.status || "PENDENTE"}</Text>
         </TouchableOpacity>
     );
 
+    const filteredExpenses = filterExpensesByMonth();
+    const { totalDespesas, totalReceitas } = calculateTotalByType(filteredExpenses);
+
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Minhas Despesas</Text>
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
+                    <Text style={styles.headerText}>Selecionar Mês</Text>
+                </TouchableOpacity>
+                <Text style = {styles.despesa}>Minhas despesas</Text>
+            </View>
+
+            {showMonthPicker && (
+                <DateTimePicker
+                    value={selectedMonth}
+                    mode="date"
+                    display="default"
+                    onChange={(event, date) => {
+                        setShowMonthPicker(false);
+                        if (date) setSelectedMonth(date);
+                    }}
+                />
+            )}
+
             <FlatList
-                data={expenses}
+                data={filteredExpenses}
                 keyExtractor={(item) => item.id}
                 renderItem={renderExpenseItem}
                 ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma despesa encontrada.</Text>}
@@ -182,11 +233,47 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     header: {
+        backgroundColor: '#2A2A2A',
+        padding: 15,
+        borderRadius: 8,
+        marginBottom: 20,
+        alignItems: 'center',
+    },
+    headerText: {
+        color: '#87CEEB',
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    despesa:{
         color: '#FFF',
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
+    },
+    monthPickerButton: {
+        backgroundColor: '#00BFFF',
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 10,
+        width: '100%',
+        alignItems: 'center',
+    },
+    monthPickerButtonText: {
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    totalContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 10,
+    },
+    totalText: {
+        color: '#FFF',
+        fontSize: 18,
     },
     expenseItem: {
         padding: 15,
@@ -267,4 +354,4 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-})
+});

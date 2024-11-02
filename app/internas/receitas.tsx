@@ -120,11 +120,13 @@ export default function IncomeScreen() {
         >
             <Text style={styles.incomeAmount}>R$ {item.amount.toFixed(2)}</Text>
             <Text style={styles.incomeDescription}>{item.description}</Text>
-            <Text style={styles.incomeDate}>Data: {item.dueDate}</Text>
+            <Text style={styles.incomeDate}>Data: {new Date(item.dueDate).toLocaleDateString('pt-BR')}</Text>
             <Text style={styles.incomeStatus}>Status: {item.status || "PENDENTE"}</Text>
         </TouchableOpacity>
     );
 
+    
+    
     return (
         <View style={styles.container}>
                      
