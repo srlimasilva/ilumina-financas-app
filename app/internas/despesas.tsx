@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, Modal, TextInput, Button } from 'react-native';
-import { ref, onValue, remove, update, push } from 'firebase/database';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
+import { ref, onValue, remove, update } from 'firebase/database';
 import { db } from '@/scripts/firebase-config';
 import { getAuth } from 'firebase/auth';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Link } from 'expo-router';
 
-export default function ExpensesScreen() {
+export default function ExpenseScreen() {
     const [expenses, setExpenses] = useState([]);
     const [selectedExpense, setSelectedExpense] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -64,53 +64,53 @@ export default function ExpensesScreen() {
             amount: parseFloat(editAmount),
             description: editDescription,
         })
-        .then(() => {
-            Alert.alert("Sucesso", "Despesa atualizada com sucesso.");
-            closeModal();
-        })
-        .catch((error) => {
-            Alert.alert("Erro", "Ocorreu um erro ao atualizar a despesa.");
-            console.error(error);
-        });
+            .then(() => {
+                Alert.alert("Sucesso", "Despesa atualizada com sucesso.");
+                closeModal();
+            })
+            .catch((error) => {
+                Alert.alert("Erro", "Ocorreu um erro ao atualizar a despesa.");
+                console.error(error);
+            });
     };
 
     const handleDeleteExpense = () => {
         const expenseRef = ref(db, `users/${userId}/expenses/${selectedExpense.id}`);
         remove(expenseRef)
-        .then(() => {
-            Alert.alert("Sucesso", "Despesa excluída com sucesso.");
-            closeModal();
-        })
-        .catch((error) => {
-            Alert.alert("Erro", "Ocorreu um erro ao excluir a despesa.");
-            console.error(error);
-        });
+            .then(() => {
+                Alert.alert("Sucesso", "Despesa excluída com sucesso.");
+                closeModal();
+            })
+            .catch((error) => {
+                Alert.alert("Erro", "Ocorreu um erro ao excluir a despesa.");
+                console.error(error);
+            });
     };
 
     const handleMarkAsPaid = () => {
         const expenseRef = ref(db, `users/${userId}/expenses/${selectedExpense.id}`);
-        update(expenseRef, { status: "PAGO" })
-        .then(() => {
-            Alert.alert("Sucesso", "Despesa marcada como paga.");
-            closeModal();
-        })
-        .catch((error) => {
-            Alert.alert("Erro", "Ocorreu um erro ao marcar a despesa como paga.");
-            console.error(error);
-        });
+        update(expenseRef, { status: "PAGA" })
+            .then(() => {
+                Alert.alert("Sucesso", "Despesa marcada como paga.");
+                closeModal();
+            })
+            .catch((error) => {
+                Alert.alert("Erro", "Ocorreu um erro ao marcar a despesa como paga.");
+                console.error(error);
+            });
     };
 
     const handleMarkAsPending = () => {
         const expenseRef = ref(db, `users/${userId}/expenses/${selectedExpense.id}`);
         update(expenseRef, { status: "PENDENTE" })
-        .then(() => {
-            Alert.alert("Sucesso", "Despesa marcada como pendente.");
-            closeModal();
-        })
-        .catch((error) => {
-            Alert.alert("Erro", "Ocorreu um erro ao marcar a despesa como pendente.");
-            console.error(error);
-        });
+            .then(() => {
+                Alert.alert("Sucesso", "Despesa marcada como pendente.");
+                closeModal();
+            })
+            .catch((error) => {
+                Alert.alert("Erro", "Ocorreu um erro ao marcar a despesa como pendente.");
+                console.error(error);
+            });
     };
 
     const filterExpensesByMonth = () => {
@@ -125,38 +125,27 @@ export default function ExpensesScreen() {
         });
     };
 
-    const calculateTotalByType = (filteredExpenses) => {
-        let totalDespesas = 0;
-        let totalReceitas = 0;
-
-        filteredExpenses.forEach((expense) => {
-            if (expense.type === 'DESPESA') {
-                totalDespesas += expense.amount;
-            } else if (expense.type === 'RECEITA') {
-                totalReceitas += expense.amount;
-            }
-        });
-
-        return { totalDespesas, totalReceitas };
+    const calculateTotalExpenses = (filteredExpenses: any[]) => {
+        return filteredExpenses.reduce((total, expense) => total + expense.amount, 0);
     };
 
-    const renderExpenseItem = ({ item }) => (
-        <TouchableOpacity 
-            onPress={() => openModal(item)} 
+    const renderExpenseItem = ({item}) => (
+        <TouchableOpacity
+            onPress={() => openModal(item)}
             style={[
-                styles.expenseItem, 
-                item.status === 'PAGO' ? styles.expenseStatusPaid : styles.expenseStatusPending
+                styles.expenseItem,
+                item.status === 'PAGA' ? styles.expenseStatusPaid : styles.expenseStatusPending
             ]}
         >
             <Text style={styles.expenseAmount}>R$ {item.amount.toFixed(2)}</Text>
             <Text style={styles.expenseDescription}>{item.description}</Text>
-            <Text style={styles.expenseDate}>Vencimento: {new Date(item.dueDate).toLocaleDateString('pt-BR')}</Text>
+            <Text style={styles.expenseDate}>Data: {new Date(item.dueDate).toLocaleDateString('pt-BR')}</Text>
             <Text style={styles.expenseStatus}>Status: {item.status || "PENDENTE"}</Text>
         </TouchableOpacity>
     );
 
     const filteredExpenses = filterExpensesByMonth();
-    const { totalDespesas, totalReceitas } = calculateTotalByType(filteredExpenses);
+    const totalExpenses = calculateTotalExpenses(filteredExpenses);
 
     return (
         <View style={styles.container}>
@@ -164,7 +153,8 @@ export default function ExpensesScreen() {
                 <TouchableOpacity onPress={() => setShowMonthPicker(true)}>
                     <Text style={styles.headerText}>Selecionar Mês</Text>
                 </TouchableOpacity>
-                <Text style = {styles.despesa}>Minhas despesas</Text>
+                <Text style={styles.despesa}>Minhas Despesas</Text>
+                <Text style={styles.totalText}>Total Despesas: R$ {totalExpenses.toFixed(2)}</Text>
             </View>
 
             {showMonthPicker && (
@@ -186,9 +176,9 @@ export default function ExpensesScreen() {
                 ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma despesa encontrada.</Text>}
             />
 
-            <Modal 
-                visible={isModalVisible} 
-                animationType="slide" 
+            <Modal
+                visible={isModalVisible}
+                animationType="slide"
                 transparent={true}
                 onRequestClose={closeModal}
             >
@@ -209,11 +199,21 @@ export default function ExpensesScreen() {
                             placeholder="Descrição"
                         />
                         <View style={styles.modalButtons}>
-                            <Button title="Atualizar" onPress={handleUpdateExpense} />
-                            <Button title="Excluir" onPress={handleDeleteExpense} color="red" />
-                            <Button title="Marcar como Paga" onPress={handleMarkAsPaid} color="green" />
-                            <Button title="Marcar como Pendente" onPress={handleMarkAsPending} color="orange" />
-                            <Button title="Cancelar" onPress={closeModal} color="gray" />
+                            <TouchableOpacity style={styles.button} onPress={handleUpdateExpense}>
+                                <Text style={styles.buttonText}>Atualizar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: 'red' }]} onPress={handleDeleteExpense}>
+                                <Text style={styles.buttonText}>Excluir</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: 'green' }]} onPress={handleMarkAsPaid}>
+                                <Text style={styles.buttonText}>Marcar como Paga</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: 'orange' }]} onPress={handleMarkAsPending}>
+                                <Text style={styles.buttonText}>Marcar como Pendente</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: 'gray' }]} onPress={closeModal}>
+                                <Text style={styles.buttonText}>Cancelar</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
@@ -245,113 +245,108 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 10,
     },
-    despesa:{
+    despesa: {
         color: '#FFF',
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
     },
-    monthPickerButton: {
-        backgroundColor: '#00BFFF',
-        padding: 10,
-        borderRadius: 8,
-        marginBottom: 10,
-        width: '100%',
-        alignItems: 'center',
-    },
-    monthPickerButtonText: {
-        color: '#FFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    totalContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        marginTop: 10,
-    },
     totalText: {
         color: '#FFF',
         fontSize: 18,
+        marginTop: 10,
     },
     expenseItem: {
+        backgroundColor: '#333',
         padding: 15,
         borderRadius: 8,
         marginBottom: 10,
     },
     expenseStatusPaid: {
-        backgroundColor: '#32CD32', // Verde para "PAGO"
+        borderLeftColor: '#32CD32',
+        borderLeftWidth: 5,
     },
     expenseStatusPending: {
-        backgroundColor: '#FF6347', // Vermelho para "PENDENTE"
+        borderLeftColor: '#FFA500',
+        borderLeftWidth: 5,
     },
     expenseAmount: {
-        color: '#FFF',
+        color: '#87CEEB',
         fontSize: 20,
         fontWeight: 'bold',
     },
     expenseDescription: {
         color: '#FFF',
         fontSize: 16,
-        marginTop: 5,
+        marginBottom: 5,
     },
     expenseDate: {
-        color: 'white',
+        color: '#FFF',
         fontSize: 14,
-        marginTop: 5,
     },
     expenseStatus: {
         color: '#FFF',
         fontSize: 14,
-        marginTop: 5,
     },
     emptyText: {
         color: '#FFF',
-        fontSize: 18,
         textAlign: 'center',
-        marginTop: 50,
+        fontSize: 16,
+        marginTop: 20,
+    },
+    addButton: {
+        backgroundColor: '#87CEEB',
+        padding: 15,
+        borderRadius: 8,
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    addButtonText: {
+        color: '#000',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
     modalBackground: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,0.7)',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     modalContainer: {
-        width: '80%',
-        backgroundColor: '#1E1E1E',
+        backgroundColor: '#D3D3D3',
         padding: 20,
         borderRadius: 8,
+        width: '80%',
     },
     modalTitle: {
-        color: '#FFF',
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 20,
-        textAlign: 'center',
+        color: '#000',
     },
     input: {
-        backgroundColor: '#333',
-        color: '#FFF',
-        padding: 15,
-        borderRadius: 8,
-        marginVertical: 10,
-        fontSize: 18,
+        borderBottomWidth: 1,
+        borderBottomColor: '#87CEEB',
+        padding: 8,
+        fontSize: 16,
+        marginBottom: 20,
     },
     modalButtons: {
-        marginTop: 20
+        flexDirection: 'column',
+        gap: 10,
     },
-    addButton: {
-        backgroundColor: '#00BFFF',
-        padding: 15,
+    button: {
+        backgroundColor: '#87CEEB',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
         borderRadius: 8,
         alignItems: 'center',
-        marginTop: 20,
+        marginVertical: 5,
     },
-    addButtonText: {
-        color: '#fff',
-        fontSize: 18,
+    buttonText: {
+        color: '#FFF',
+        fontSize: 16,
         fontWeight: 'bold',
     },
 });

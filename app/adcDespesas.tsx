@@ -11,7 +11,6 @@ export default function AddExpenseScreen() {
     const [amount, setAmount] = useState('');
     const [description, setDescription] = useState('');
     const [dueDate, setDueDate] = useState(new Date());
-    const [repeatOption, setRepeatOption] = useState('Não repetir');
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     const auth = getAuth();
@@ -29,7 +28,7 @@ export default function AddExpenseScreen() {
                 amount: parseFloat(amount),
                 description,
                 dueDate: dueDate.toISOString().split('T')[0],
-                repeatOption,
+
             };
 
             try {
@@ -80,20 +79,6 @@ export default function AddExpenseScreen() {
                 />
             )}
 
-            <View style={styles.repeatOptions}>
-                {['Não repetir', 'Sempre', 'Parcelado'].map(option => (
-                    <TouchableOpacity
-                        key={option}
-                        style={[
-                            styles.repeatButton,
-                            repeatOption === option && styles.selectedRepeatButton,
-                        ]}
-                        onPress={() => setRepeatOption(option)}
-                    >
-                        <Text style={styles.repeatButtonText}>{option}</Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                 <Text style={styles.saveButtonText}>Salvar</Text>
