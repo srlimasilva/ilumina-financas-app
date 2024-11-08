@@ -41,7 +41,7 @@ export default function LoginScreen() {
         <View style={styles.container}>
             <Image style={styles.logo} source={require('../assets/images/logo.png')} />
 
-            <Text style={styles.title}>Bem-vindo ao Finanças Fácil</Text>
+            <Text style={styles.title}>Bem-vindo ao Ilumina Finanças</Text>
             <Text style={styles.subtitle}>Acompanhe suas despesas e organize seu orçamento!</Text>
 
             <TextInput

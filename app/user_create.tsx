@@ -10,21 +10,20 @@ export default function CreateUser() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [errorCreateUser, setErrorCreateUser] = useState(null);
+    const [error, setError] = useState({ nome: "", email: "", password: "", createUser: "" });
 
     const validarCampos = () => {
-        if (nome === "") {
-            setErrorCreateUser("Informe um nome");
-            return false;
-        } else if (email === "") {
-            setErrorCreateUser("Informe um email");
-            return false;
-        } else if (password === "") {
-            setErrorCreateUser("Informe uma senha");
-            return false;
-        }
-        setErrorCreateUser(null);
-        return true;
+        let nomeError = "";
+        let emailError = "";
+        let passwordError = "";
+
+        if (nome === "") nomeError = "Informe um nome.";
+        if (email === "") emailError = "Informe um e-mail.";
+        if (password === "") passwordError = "Informe uma senha.";
+
+        setError({ nome: nomeError, email: emailError, password: passwordError, createUser: "" });
+
+        return !nomeError && !emailError && !passwordError;
     };
 
     const createUser = () => {
@@ -40,90 +39,93 @@ export default function CreateUser() {
                 router.push('/');
             })
             .catch((error) => {
-                const errorMessage = error.message;
-                setErrorCreateUser(errorMessage);
+                setError(prev => ({ ...prev, createUser: "Erro ao criar usuário. Verifique os dados." }));
             });
     };
 
     return (
         <View style={styles.container}>
-            {errorCreateUser && (
-                <Text style={styles.alert}>{errorCreateUser}</Text>
-            )}
-
-            <Text style={styles.titulo}>Cadastrar Usuário</Text>
+            <Text style={styles.title}>Cadastrar Usuário</Text>
 
             <TextInput
                 style={styles.input}
-                placeholder='Nome'
+                placeholder="Nome"
                 value={nome}
-                onChangeText={setNome}
+                onChangeText={(text) => setNome(text)}
             />
+            {error.nome ? <Text style={styles.errorText}>{error.nome}</Text> : null}
 
             <TextInput
                 style={styles.input}
-                placeholder='E-mail'
+                placeholder="E-mail"
                 value={email}
-                onChangeText={setEmail}
-                keyboardType='email-address'
+                onChangeText={(text) => setEmail(text)}
+                keyboardType="email-address"
             />
+            {error.email ? <Text style={styles.errorText}>{error.email}</Text> : null}
 
             <TextInput
                 style={styles.input}
                 secureTextEntry={true}
-                placeholder='Senha'
+                placeholder="Senha"
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => setPassword(text)}
             />
+            {error.password ? <Text style={styles.errorText}>{error.password}</Text> : null}
+
+            {error.createUser ? <Text style={styles.errorText}>{error.createUser}</Text> : null}
 
             <TouchableOpacity
                 style={styles.button}
                 onPress={createUser}
             >
-                <Text style={styles.textButton}>Criar usuário</Text>
+                <Text style={styles.buttonText}>Criar usuário</Text>
             </TouchableOpacity>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    titulo: {
-        color: "#fff",
-        fontSize: 32,
-        marginBottom: 50
-    },
     container: {
-        backgroundColor: "grey",
-        padding: 30,
         flex: 1,
-        width: '100%',
+        backgroundColor: '#F3F4F6',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: 20,
     },
-    alert: {
-        fontSize: 18,
+    title: {
+        fontSize: 32,
+        color: '#1F2937',
+        fontWeight: 'bold',
+        marginBottom: 30,
         textAlign: 'center',
-        color: '#FFF',
-        marginBottom: 20,
     },
     input: {
         fontSize: 18,
         borderRadius: 10,
         backgroundColor: '#FFF',
-        padding: 20,
-        marginBottom: 20,
-        width: '100%'
+        padding: 15,
+        marginBottom: 5,
+        width: '100%',
+    },
+    errorText: {
+        color: '#DC2626',
+        fontSize: 14,
+        marginBottom: 10,
+        alignSelf: 'flex-start',
     },
     button: {
-        backgroundColor: '#070A52',
-        padding: 10,
-        borderRadius: 10,
-        marginBottom: 20,
-        width: '100%'
+        backgroundColor: '#10B981',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 8,
+        marginTop: 10,
+        width: '80%',
+        alignItems: 'center',
     },
-    textButton: {
-        fontSize: 24,
-        textAlign: 'center',
-        color: '#fff'
-    }
+    buttonText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
 });
